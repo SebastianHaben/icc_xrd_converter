@@ -69,20 +69,18 @@ def add_pdfs(pdflist,xrd_data,ax):
     return pdfs_plot_data
 
 
-def to_csv(xrd_data, export_path):
-    df = pd.DataFrame( data=[xrd_data.wavelength,xrd_data.amplitudes], index = ['2theta [°]','Intensity [a.u.]']).transpose()
-    df.to_csv(os.path.join(export_path, xrd_data.meta['SampleName']+'.csv'), index = False)
-
-
-def convert_plot_export(file_path, pdf_list=[]):
-    start_time = time.time()
+def to_csv(file_path, export_dir=None):
     xrd_data = specio.specread(file_path)
-    print('Extracted Metadata:')
-    print(xrd_data.meta)
+    df = pd.DataFrame(data=[xrd_data.wavelength, xrd_data.amplitudes],
+                      index=['2theta', 'counts']).transpose()
+    if export_dir is None:
+        export_dir = os.path.dirname(file_path)
+    df.to_csv(os.path.join(export_dir, xrd_data.meta['SampleName']+'.csv'), index=False)
+
+
+def convert_plot_export(file_path, pdf_list=[],):
+    xrd_data = specio.specread(file_path)
     fig, ax = plot_xrd(xrd_data, pdf_list)
-    end_time = time.time()
-    delta_t = round((end_time-start_time)*1000,1)
-    print("\nConverting, Plotting and Exporting the file took %d ms to comupute."%delta_t)
     return fig, xrd_data
     
     
